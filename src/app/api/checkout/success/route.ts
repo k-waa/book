@@ -12,26 +12,30 @@ export async function POST(request: Request) {
     try {
         const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-        const existingPurchase = prisma.purchase.findFirst({
-            where: {
-                userId: session.client_reference_id!,
-                bookId: session.metadata?.bookId!
-            }
-        })
+        if(session.metadata && session.client_reference_id) {
+            const existingPurchase = prisma.purchase.findFirst({
+                where: {
+                    userId: session.client_reference_id,
+                    bookId: session.metadata.bookId
+                }
+            })
 
-        // バグ要修正
-        // if(!existingPurchase) {
-        const purchase = await prisma.purchase.create({
-            data: {
-                userId: session.client_reference_id!,
-                bookId: session.metadata?.bookId!,
-            }
-        });
+            // バグ要修正
+            // if(!existingPurchase) {
+            const purchase = await prisma.purchase.create({
+                data: {
+                    userId: session.client_reference_id,
+                    bookId: session.metadata.bookId,
+                }
+            });
 
-        return NextResponse.json({ purchase, existingPurchase });
-        // } else {
-        //     return NextResponse.json({message: "すでに購入済みです"})
-        // }
+            return NextResponse.json({ purchase, existingPurchase });
+            // } else {
+            //     return NextResponse.json({message: "すでに購入済みです"})
+            // }
+        } else {
+            return NextResponse.json({ message: 'invalid params' })
+        }
         
     } catch (err) {
         if(err instanceof Error) {

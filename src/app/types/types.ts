@@ -6,6 +6,7 @@ type BookType = {
     thumbnail: { url: string };
     createdAt: string;
     updatedAt: string;
+    publishedAt: string;
 };
 
 type User = {

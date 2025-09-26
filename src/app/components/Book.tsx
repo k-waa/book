@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BookType } from "../types/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { DefaultSession } from "next-auth";
 
 type BookProps = {
     book: BookType;
@@ -16,11 +17,18 @@ type BookProps = {
 const Book = ({ book, isPurchased }: BookProps) => {
   const [showModal, setShowModal] = useState(false);
   const {data: session} = useSession();
-  const user: any = session?.user;
+  const [user, setUser] = useState<{id: string;} & DefaultSession|null>()
   const router = useRouter();
+
+  useEffect(() => {
+    if(session && session.user) {
+      setUser(session.user)
+    }
+  },[session])
 
   const startCheckout = async () => {
     try {
+      if(user) {
         const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/checkout`, {
                 "method": "POST",
@@ -28,7 +36,7 @@ const Book = ({ book, isPurchased }: BookProps) => {
                 body: JSON.stringify({
                     title: book.title,
                     price: book.price,
-                    userId: user?.id,
+                    userId: user.id,
                     bookId: book.id
                 })
             });
@@ -38,6 +46,7 @@ const Book = ({ book, isPurchased }: BookProps) => {
         if(responseData) {
             router.push(responseData.checkout_url);
         }
+      }
     } catch (err) {
 
     }
