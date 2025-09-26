@@ -2,7 +2,12 @@ import prisma from "@/app/lib/prisma";
 import { NextResponse } from "next/server";
 import Stripe from "stripe"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecretKey) {
+  // 開発者や運用者に分かりやすいメッセージをthrowする
+  throw new Error("STRIPE_SECRET_KEY is not defined. Please set the environment variable.");
+}
+const stripe = new Stripe(stripeSecretKey);
 
 // 購入履歴の保存
 export async function POST(request: Request) {
