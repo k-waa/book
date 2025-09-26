@@ -6,7 +6,7 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 if (!stripeSecretKey) {
   // 開発者や運用者に分かりやすいメッセージをthrowする
   throw new Error("STRIPE_SECRET_KEY is not defined. Please set the environment variable.");
-}
+} 
 const stripe = new Stripe(stripeSecretKey);
 
 // 購入履歴の保存
