@@ -14,6 +14,10 @@ export async function GET(
 
         return NextResponse.json(purchases)
     } catch (err) {
-        return NextResponse.json(err)
+        if(err instanceof Error) {
+            return NextResponse.json({ message: err.message })
+        }
+        
+        return NextResponse.json({ message: 'an unknown error' })
     }
 }

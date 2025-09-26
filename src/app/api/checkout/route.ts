@@ -30,7 +30,11 @@ export async function POST(request: Request) {
         });
 
         return NextResponse.json({ checkout_url: session.url })
-    } catch  (err: any) {
-        return NextResponse.json(err.message)
+    } catch  (err) {
+        if(err instanceof Error) {
+            return NextResponse.json({ message: err.message })
+        }
+
+        return NextResponse.json({ message: 'an unknown error' })
     }
 }
