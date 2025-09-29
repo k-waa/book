@@ -9,6 +9,11 @@ export const client = createClient({
 export const getAllBooks = async () => {
     const allBooks = await client.getList<BookType>({
         endpoint: "bookcommerce",
+        customRequestInit: {
+            next: {
+                revalidate: 3600
+            }
+        }
     })
 
     return allBooks
